@@ -11,9 +11,6 @@
 const portfolioBTC = 14.8;
 
 
-
-
-
 /* ================================
    Particle Background
 ================================ */
@@ -26,45 +23,31 @@ if (particleContainer) {
 
     const particleCount = 45;
 
-
     for (let i = 0; i < particleCount; i++) {
 
         const particle =
         document.createElement("div");
 
-
         particle.className =
         "particle";
-
 
         particle.style.left =
         Math.random() * 100 + "%";
 
-
         particle.style.animationDuration =
         (5 + Math.random() * 10) + "s";
-
 
         particle.style.animationDelay =
         Math.random() * 5 + "s";
 
-
         particle.style.opacity =
         Math.random();
-
 
         particleContainer.appendChild(
             particle
         );
-
     }
-
 }
-
-
-
-
-
 
 
 /* ================================
@@ -74,270 +57,203 @@ if (particleContainer) {
 const walletValue =
 document.querySelector("#walletValue");
 
-
 const btcBalance =
 document.querySelector("#btcBalance");
-
 
 const btcPrice =
 document.querySelector("#btcPrice");
 
-
 const eurValue =
 document.querySelector("#eurValue");
-
-
-
-
-
-
 
 
 /* ================================
    Live BTC Portfolio Update
 ================================ */
 
-async function updatePortfolio(){
+async function updatePortfolio() {
+
+    try {
+
+        if (btcBalance) {
+
+            btcBalance.textContent =
+            portfolioBTC.toFixed(2) + " BTC";
+
+        }
 
 
-try {
+        /* BTC price from Kraken */
 
-
-    if(btcBalance){
-
-        btcBalance.textContent =
-        portfolioBTC.toFixed(2) + " BTC";
-
-    }
-
-
-
-
-    // BTC price from Kraken
-
-    const priceResponse =
-    await fetch(
-    "https://api.kraken.com/0/public/Ticker?pair=XBTUSD"
-    );
-
-
-    const priceData =
-    await priceResponse.json();
-
-
-    const btcUSD =
-    Number(
-        priceData.result.XXBTZUSD.c[0]
-    );
-
-
-
-
-
-    if(btcPrice){
-
-        btcPrice.textContent =
-        "$" +
-        btcUSD.toLocaleString(
-            undefined,
-            {
-                maximumFractionDigits:2
-            }
+        const priceResponse =
+        await fetch(
+            "https://api.kraken.com/0/public/Ticker?pair=XBTUSD"
         );
 
-    }
+
+        const priceData =
+        await priceResponse.json();
 
 
-
-
-
-
-
-    // USD to EUR conversion
-
-    const eurResponse =
-    await fetch(
-    "https://open.er-api.com/v6/latest/USD"
-    );
-
-
-    const eurData =
-    await eurResponse.json();
-
-
-    const usdToEUR =
-    eurData.rates.EUR;
-
-
-
-
-
-
-    // Calculate portfolio
-
-    const totalUSD =
-    portfolioBTC * btcUSD;
-
-
-    const totalEUR =
-    totalUSD * usdToEUR;
-
-
-
-
-
-
-    if(walletValue){
-
-        walletValue.textContent =
-        "$" +
-        totalUSD.toLocaleString(
-            undefined,
-            {
-                minimumFractionDigits:2,
-                maximumFractionDigits:2
-            }
+        const btcUSD =
+        Number(
+            priceData.result.XXBTZUSD.c[0]
         );
 
-    }
+
+        if (btcPrice) {
+
+            btcPrice.textContent =
+            "$" +
+            btcUSD.toLocaleString(
+                undefined,
+                {
+                    maximumFractionDigits: 2
+                }
+            );
+
+        }
 
 
+        /* USD to EUR conversion */
 
-
-
-
-    if(eurValue){
-
-        eurValue.textContent =
-        "€" +
-        totalEUR.toLocaleString(
-            undefined,
-            {
-                minimumFractionDigits:2,
-                maximumFractionDigits:2
-            }
+        const eurResponse =
+        await fetch(
+            "https://open.er-api.com/v6/latest/USD"
         );
 
+
+        const eurData =
+        await eurResponse.json();
+
+
+        const usdToEUR =
+        eurData.rates.EUR;
+
+
+        /* Calculate portfolio */
+
+        const totalUSD =
+        portfolioBTC * btcUSD;
+
+
+        const totalEUR =
+        totalUSD * usdToEUR;
+
+
+        if (walletValue) {
+
+            walletValue.textContent =
+            "$" +
+            totalUSD.toLocaleString(
+                undefined,
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            );
+
+        }
+
+
+        if (eurValue) {
+
+            eurValue.textContent =
+            "€" +
+            totalEUR.toLocaleString(
+                undefined,
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            );
+
+        }
+
     }
 
+    catch (error) {
+
+        console.error(
+            "Portfolio update error:",
+            error
+        );
 
 
-}
+        if (walletValue) {
+
+            walletValue.textContent =
+            "Unavailable";
+
+        }
 
 
-catch(error){
+        if (btcPrice) {
+
+            btcPrice.textContent =
+            "Unavailable";
+
+        }
 
 
-console.error(
-"Portfolio update error:",
-error
-);
+        if (eurValue) {
 
+            eurValue.textContent =
+            "Unavailable";
 
+        }
 
-if(walletValue){
-
-walletValue.textContent =
-"Unavailable";
-
-}
-
-
-
-if(btcPrice){
-
-btcPrice.textContent =
-"Unavailable";
-
-}
-
-
-
-if(eurValue){
-
-eurValue.textContent =
-"Unavailable";
+    }
 
 }
-
-
-
-}
-
-
-
-}
-
-
-
 
 
 updatePortfolio();
 
 
 setInterval(
-updatePortfolio,
-30000
+    updatePortfolio,
+    30000
 );
-
-
-
-
-
-
-
 
 
 /* ================================
    Toast System
 ================================ */
 
-
 const toast =
 document.querySelector("#toast");
 
 
-function showToast(message){
+function showToast(message) {
+
+    if (!toast)
+        return;
 
 
-if(!toast)
-return;
+    toast.textContent =
+    message;
 
 
-toast.textContent =
-message;
+    toast.classList.add(
+        "show"
+    );
 
 
-toast.classList.add(
-"show"
-);
+    setTimeout(() => {
 
+        toast.classList.remove(
+            "show"
+        );
 
-setTimeout(()=>{
-
-
-toast.classList.remove(
-"show"
-);
-
-
-},2500);
-
+    }, 2500);
 
 }
-
-
-
-
-
-
-
 
 
 /* ================================
    Copy Wallet
 ================================ */
-
 
 const copyButton =
 document.querySelector("#copyWallet");
@@ -347,307 +263,221 @@ const wallet =
 document.querySelector("#walletAddress");
 
 
+if (copyButton && wallet) {
 
-if(copyButton && wallet){
+    copyButton.addEventListener(
+        "click",
+        async () => {
 
+            try {
 
-copyButton.addEventListener(
-"click",
-async()=>{
-
-
-try{
-
-
-await navigator.clipboard.writeText(
-wallet.textContent
-);
+                await navigator.clipboard.writeText(
+                    wallet.textContent
+                );
 
 
-
-copyButton.textContent =
-"Copied ✓";
-
-
-showToast(
-"Wallet address copied"
-);
+                copyButton.textContent =
+                "Copied ✓";
 
 
-
-setTimeout(()=>{
-
-
-copyButton.textContent =
-"Copy Wallet";
+                showToast(
+                    "Wallet address copied"
+                );
 
 
-},2000);
+                setTimeout(() => {
 
+                    copyButton.textContent =
+                    "Copy Wallet";
 
+                }, 2000);
 
-}
+            }
 
+            catch (error) {
 
-catch(error){
+                showToast(
+                    "Copy failed"
+                );
 
+            }
 
-showToast(
-"Copy failed"
-);
-
+        }
+    );
 
 }
-
-
-
-});
-
-
-}
-
-
-
-
-
-
-
 
 
 /* ================================
    Synchronization Time
 ================================ */
 
-
 const sync =
 document.querySelector("#syncTime");
 
 
+function updateTime() {
 
-function updateTime(){
+    if (sync) {
 
+        sync.textContent =
+        new Date().toLocaleString();
 
-if(sync){
-
-sync.textContent =
-new Date().toLocaleString();
-
-}
+    }
 
 }
-
 
 
 updateTime();
 
 
 setInterval(
-updateTime,
-60000
+    updateTime,
+    60000
 );
-
-
-
-
-
-
-
 
 
 /* ================================
    Security Score
 ================================ */
 
-
 const security =
 document.querySelector(".security");
 
 
+if (security) {
 
-if(security){
+    let score = 0;
 
-
-let score = 0;
-
-
-const target = 98;
+    const target = 98;
 
 
+    const securityAnimation =
+    setInterval(() => {
 
-const securityAnimation =
-setInterval(()=>{
+        score++;
 
-
-score++;
-
-
-security.textContent =
-score + "%";
+        security.textContent =
+        score + "%";
 
 
+        if (score >= target) {
 
-if(score >= target){
+            clearInterval(
+                securityAnimation
+            );
 
+        }
 
-clearInterval(
-securityAnimation
-);
-
+    }, 18);
 
 }
-
-
-
-},18);
-
-
-}
-
-
-
-
-
-
-
 
 
 /* ================================
    Premium Card Glow
 ================================ */
 
-
 const cards =
 document.querySelectorAll(".card");
 
 
+cards.forEach(card => {
 
-cards.forEach(card=>{
+    card.addEventListener(
+        "mousemove",
+        (e) => {
 
-
-card.addEventListener(
-"mousemove",
-(e)=>{
-
-
-const rect =
-card.getBoundingClientRect();
+            const rect =
+            card.getBoundingClientRect();
 
 
-const x =
-e.clientX - rect.left;
+            const x =
+            e.clientX - rect.left;
 
 
-const y =
-e.clientY - rect.top;
+            const y =
+            e.clientY - rect.top;
 
 
+            card.style.background = `
 
-card.style.background = `
+                radial-gradient(
 
-radial-gradient(
+                    circle at ${x}px ${y}px,
 
-circle at ${x}px ${y}px,
+                    rgba(255,183,0,.22),
 
-rgba(255,183,0,.22),
+                    rgba(255,255,255,.08)
 
-rgba(255,255,255,.08)
+                )
 
-)
+            `;
 
-`;
-
-
-
-});
+        }
+    );
 
 
+    card.addEventListener(
+        "mouseleave",
+        () => {
 
+            card.style.background =
+            "rgba(255,255,255,.08)";
 
-card.addEventListener(
-"mouseleave",
-()=>{
-
-
-card.style.background =
-"rgba(255,255,255,.08)";
-
+        }
+    );
 
 });
-
-
-});
-
-
-
-
-
-
-
 
 
 /* ================================
    Status Pulse
 ================================ */
 
-
 const status =
 document.querySelector(".status");
 
 
-if(status){
+if (status) {
+
+    setInterval(() => {
+
+        status.style.transform =
+        "scale(1.03)";
 
 
-setInterval(()=>{
+        setTimeout(() => {
 
+            status.style.transform =
+            "scale(1)";
 
-status.style.transform =
-"scale(1.03)";
+        }, 300);
 
-
-setTimeout(()=>{
-
-
-status.style.transform =
-"scale(1)";
-
-
-},300);
-
-
-
-},3000);
-
+    }, 3000);
 
 }
-
-
-
-
-
-
-
 
 
 /* ================================
    Page Loaded
 ================================ */
 
-
 window.addEventListener(
-"load",
-()=>{
+    "load",
+    () => {
 
+        document.body.classList.add(
+            "ready"
+        );
 
-document.body.classList.add(
-"ready"
+    }
 );
 
 
-});
 /* ================================
    English / Italian Translator
 ================================ */
-
 
 const languageBtn =
 document.querySelector("#languageBtn");
@@ -656,52 +486,49 @@ document.querySelector("#languageBtn");
 let italianMode = false;
 
 
+if (languageBtn) {
 
-if(languageBtn){
+    languageBtn.addEventListener(
+        "click",
+        () => {
 
-
-languageBtn.addEventListener(
-"click",
-()=>{
-
-
-italianMode =
-!italianMode;
+            italianMode =
+            !italianMode;
 
 
+            document
+            .querySelectorAll("[data-en]")
+            .forEach(text => {
 
-document.querySelectorAll("[data-en]")
-.forEach(text=>{
+                text.textContent =
+                italianMode
+                ? text.dataset.it
+                : text.dataset.en;
 
-
-text.textContent =
-italianMode
-?
-text.dataset.it
-:
-text.dataset.en;
-
-
-});
+            });
 
 
+            languageBtn.textContent =
+            italianMode
+            ? "🇬🇧 English"
+            : "🇮🇹 Italiano";
 
-languageBtn.textContent =
-italianMode
-?
-"🇬🇧 English"
-:
-"🇮🇹 Italiano";
-
-
-});
-
+        }
+    );
 
 }
+
+
 /* ================================
-   Local Private Login
+   Private Login
 ================================ */
 
+/*
+   IMPORTANT:
+   This is a client-side login only.
+   It is NOT secure authentication because
+   the credentials are contained in JavaScript.
+*/
 
 const privateEmail =
 "bertirotti@libero.it";
@@ -711,80 +538,136 @@ const privatePassword =
 "BRTGST43H05A576P";
 
 
-
 const loginButton =
 document.querySelector("#loginButton");
-
 
 
 const loginMessage =
 document.querySelector("#loginMessage");
 
 
+const loginEmail =
+document.querySelector("#loginEmail");
 
 
-if(localStorage.getItem("vaultLogin") === "true"){
+const loginPassword =
+document.querySelector("#loginPassword");
 
-document.body.classList.add(
-"logged-in"
+
+/*
+   Make sure the dashboard is locked
+   when the page is opened.
+*/
+
+document.body.classList.remove(
+    "logged-in"
 );
+
+
+/*
+   Login button
+*/
+
+if (loginButton) {
+
+    loginButton.addEventListener(
+        "click",
+        () => {
+
+            const email =
+            loginEmail.value.trim();
+
+
+            const password =
+            loginPassword.value;
+
+
+            /*
+               Check email and password
+            */
+
+            if (
+                email === privateEmail &&
+                password === privatePassword
+            ) {
+
+                /*
+                   Correct login
+                */
+
+                document.body.classList.add(
+                    "logged-in"
+                );
+
+
+                loginMessage.textContent =
+                "";
+
+
+                /*
+                   Clear the fields
+                */
+
+                loginEmail.value =
+                "";
+
+                loginPassword.value =
+                "";
+
+            }
+
+            else {
+
+                /*
+                   Incorrect login
+                */
+
+                loginMessage.textContent =
+                "Incorrect email or password";
+
+
+                loginPassword.value =
+                "";
+
+            }
+
+        }
+    );
 
 }
 
 
+/* ================================
+   Login With Enter Key
+================================ */
+
+if (loginEmail && loginPassword) {
+
+    loginEmail.addEventListener(
+        "keydown",
+        (event) => {
+
+            if (event.key === "Enter") {
+
+                loginButton.click();
+
+            }
+
+        }
+    );
 
 
-if(loginButton){
+    loginPassword.addEventListener(
+        "keydown",
+        (event) => {
 
+            if (event.key === "Enter") {
 
-loginButton.addEventListener(
-"click",
-()=>{
+                loginButton.click();
 
+            }
 
-const email =
-document.querySelector("#loginEmail").value;
-
-
-const password =
-document.querySelector("#loginPassword").value;
-
-
-
-
-if(
-email === privateEmail &&
-password === privatePassword
-){
-
-
-localStorage.setItem(
-"vaultLogin",
-"true"
-);
-
-
-
-document.body.classList.add(
-"logged-in"
-);
-
-
-
-}
-
-else{
-
-
-loginMessage.textContent =
-"Incorrect email or password";
-
-
-}
-
-
-
-});
-
+        }
+    );
 
 }
